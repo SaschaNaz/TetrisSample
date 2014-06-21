@@ -1,0 +1,37 @@
+﻿body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #EAE2F1;
+}
+
+span {
+    font-style: italic;
+}
+
+#content {
+    width: 400px;
+    height: 600px;
+}
+    #content * {
+        border: 1px solid #EEEEEE;
+    }
+        #content *[data-tetris-color=madoka] {
+            background-color: #F7BBC3;
+        }
+        #content *[data-tetris-color=homura] {
+            background-color: #6C6B69;
+        }
+        #content *[data-tetris-color=sayaka] {
+            background-color: #87B1C1;
+        }
+        #content *[data-tetris-color=kyouko] {
+            background-color: #B05F6E;
+        }
+        #content *[data-tetris-color=mami] {
+            background-color: #F6DF93;
+        }
+        #content *[data-tetris-color=nagisa] {
+            background-color: #754A20;
+        }
+        #content *[data-tetris-color=kyubey] {
+            background-color: #F8F3F9;
+        }
