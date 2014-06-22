@@ -1,5 +1,6 @@
-﻿document.addEventListener("DOMContentLoaded", function () {
-    TetrisMatrixSetter.morph(content, [15, 10]);
+﻿var center;
+document.addEventListener("DOMContentLoaded", function () {
+    center = TetrisMatrixSetter.morph(content, [15, 10]);
 });
 var Multidimension = (function () {
     function Multidimension() {
@@ -67,7 +68,7 @@ var TetrisMatrixSetter = (function () {
         Multidimension.forEach(size, function (coordinate) {
             var cell = _this._createCell(coordinate);
             cellMatrix.set(coordinate.map(function (n) {
-                return n - 1;
+                return n + 1;
             }), cell);
             div.appendChild(cell);
         });
@@ -108,13 +109,14 @@ var TetrisBlock = (function () {
 
     TetrisBlock.prototype.rotate = function () {
         var base = this.structure;
-        var size = base.size;
         var rotated = new Matrix(base.size.slice().reverse());
+        var rotatedSize = rotated.size;
 
         base.forEach(function (item, coordinate) {
             var newCoordinate = [];
             newCoordinate[0] = coordinate[1];
-            newCoordinate[1] = size[1] - coordinate[0] + 1;
+            newCoordinate[1] = rotatedSize[1] - coordinate[0] + 1;
+            rotated.set(newCoordinate, item);
         });
 
         this._disappear();

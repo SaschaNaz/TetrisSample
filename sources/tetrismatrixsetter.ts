@@ -35,7 +35,7 @@ class TetrisMatrixSetter {
 
         Multidimension.forEach(size, (coordinate) => {
             var cell = this._createCell(coordinate);
-            cellMatrix.set(coordinate.map((n) => n - 1), cell);
+            cellMatrix.set(coordinate.map((n) => n + 1), cell);
             div.appendChild(cell);
         });
 

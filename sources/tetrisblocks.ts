@@ -16,13 +16,14 @@
 
     rotate() {
         var base = this.structure;
-        var size = base.size;
         var rotated = new Matrix<boolean>(base.size.slice().reverse());
+        var rotatedSize = rotated.size;
 
         base.forEach((item, coordinate) => {
             var newCoordinate: number[] = [];
             newCoordinate[0] = coordinate[1];
-            newCoordinate[1] = size[1] - coordinate[0] + 1;
+            newCoordinate[1] = rotatedSize[1] - coordinate[0] + 1;
+            rotated.set(newCoordinate, item);
         });
 
         this._disappear();
