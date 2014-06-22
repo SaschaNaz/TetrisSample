@@ -38,7 +38,6 @@ class TetrisMatrixSetter {
             cellMatrix.set(coordinate.map((n) => n - 1), cell);
             div.appendChild(cell);
         });
-        cellMatrix.push(cellRow);
 
         return cellMatrix;
     }
@@ -47,7 +46,7 @@ class TetrisMatrixSetter {
         var cell = document.createElement("div");
         cell.style.msGridRow = coordinate[0] + 1;
         cell.style.msGridColumn = coordinate[1] + 1;
-        return cell;
+        return <TetrisCell>cell;
     }
     private static _generateGridPartitionString(partitions: number) {
         var result: string[] = [];

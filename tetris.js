@@ -29,187 +29,6 @@ var Multidimension = (function () {
     };
     return Multidimension;
 })();
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var TetrisBlockTypes = (function () {
-    function TetrisBlockTypes() {
-    }
-    TetrisBlockTypes.Madoka = "madoka";
-    TetrisBlockTypes.Homura = "homura";
-    TetrisBlockTypes.Sayaka = "sayaka";
-    TetrisBlockTypes.Kyouko = "kyouko";
-    TetrisBlockTypes.Mami = "mami";
-    TetrisBlockTypes.Nagisa = "nagisa";
-    TetrisBlockTypes.Kyubey = "kyubey";
-    return TetrisBlockTypes;
-})();
-
-var MadokaBlock = (function (_super) {
-    __extends(MadokaBlock, _super);
-    function MadokaBlock() {
-        _super.apply(this, arguments);
-        this.structure = new Matrix([1, 4], [
-            true, true, true, true
-        ]);
-        this.blockType = TetrisBlockTypes.Madoka;
-    }
-    return MadokaBlock;
-})(TetrisBlock);
-
-var HomuraBlock = (function (_super) {
-    __extends(HomuraBlock, _super);
-    function HomuraBlock() {
-        _super.apply(this, arguments);
-        this.structure = new Matrix([2, 2], [
-            true, true,
-            true, true
-        ]);
-        this.color = TetrisBlockTypes.Homura;
-    }
-    return HomuraBlock;
-})(TetrisBlock);
-
-var SayakaBlock = (function (_super) {
-    __extends(SayakaBlock, _super);
-    function SayakaBlock() {
-        _super.apply(this, arguments);
-        this.structure = new Matrix([2, 3], [
-            true, true, true,
-            false, false, true
-        ]);
-        this.color = TetrisBlockTypes.Sayaka;
-    }
-    return SayakaBlock;
-})(TetrisBlock);
-
-var KyoukoBlock = (function (_super) {
-    __extends(KyoukoBlock, _super);
-    function KyoukoBlock() {
-        _super.apply(this, arguments);
-        this.structure = new Matrix([2, 3], [
-            true, true, true,
-            true, false, false
-        ]);
-        this.color = TetrisBlockTypes.Kyouko;
-    }
-    return KyoukoBlock;
-})(TetrisBlock);
-
-var MamiBlock = (function (_super) {
-    __extends(MamiBlock, _super);
-    function MamiBlock() {
-        _super.apply(this, arguments);
-        this.structure = new Matrix([2, 3], [
-            false, true, true,
-            true, true, false
-        ]);
-        this.color = TetrisBlockTypes.Mami;
-    }
-    return MamiBlock;
-})(TetrisBlock);
-
-var NagisaBlock = (function (_super) {
-    __extends(NagisaBlock, _super);
-    function NagisaBlock() {
-        _super.apply(this, arguments);
-        this.structure = new Matrix([2, 3], [
-            true, true, false,
-            false, true, true
-        ]);
-        this.color = TetrisBlockTypes.Nagisa;
-    }
-    return NagisaBlock;
-})(TetrisBlock);
-
-var KyubeyBlock = (function (_super) {
-    __extends(KyubeyBlock, _super);
-    function KyubeyBlock() {
-        _super.apply(this, arguments);
-        this.structure = new Matrix([2, 3], [
-            true, true, true,
-            false, true, false
-        ]);
-        this.color = TetrisBlockTypes.Kyubey;
-    }
-    return KyubeyBlock;
-})(TetrisBlock);
-
-var TetrisBlock = (function () {
-    function TetrisBlock() {
-    }
-    TetrisBlock.prototype.moveBy = function (relativeCoordinate) {
-        Assert.assertArray(relativeCoordinate, 2);
-    };
-
-    TetrisBlock.prototype.rotate = function () {
-        var base = this.structure;
-        var size = base.size;
-        var rotated = new Matrix(base.size.slice().reverse());
-
-        base.forEach(function (item, coordinate) {
-            var newCoordinate = [];
-            newCoordinate[0] = coordinate[1];
-            newCoordinate[1] = size[1] - coordinate[0] + 1;
-        });
-
-        this._disappear();
-        this.structure = rotated;
-
-        //
-        this._appear([this.coordinate[0] + size[0], this.coordinate[1]]);
-    };
-
-    TetrisBlock.prototype._disappear = function () {
-    };
-    TetrisBlock.prototype._appear = function (coordinate) {
-    };
-    return TetrisBlock;
-})();
-var TetrisCenter = (function () {
-    function TetrisCenter() {
-    }
-    TetrisCenter.prototype.createCharacter = function (charType) {
-        var blockTypeOf = (function () {
-            switch (charType) {
-                case "madoka":
-                    return MadokaBlock;
-                case "homura":
-                    return HomuraBlock;
-                case "sayaka":
-                    return SayakaBlock;
-                case "kyouko":
-                    return KyoukoBlock;
-                case "mami":
-                    return MamiBlock;
-                case "nagisa":
-                    return NagisaBlock;
-                case "kyubey":
-                    return KyubeyBlock;
-            }
-        })();
-        var block = new blockTypeOf();
-        block.parentMap = this.morphedDiv;
-        return block;
-    };
-
-    TetrisCenter.prototype.isAvailable = function () {
-        var coordinates = [];
-        for (var _i = 0; _i < (arguments.length - 0); _i++) {
-            coordinates[_i] = arguments[_i + 0];
-        }
-        for (var i = 0; i < coordinates.length; i++) {
-            var coordinate = coordinates[i].slice().reverse();
-            if (!this.cellMatrix.get([coordinate[0], coordinate[1]]).dataset.tetrisCellType)
-                return false;
-        }
-        return true;
-    };
-    return TetrisCenter;
-})();
 var Assert = (function () {
     function Assert() {
     }
@@ -252,7 +71,6 @@ var TetrisMatrixSetter = (function () {
             }), cell);
             div.appendChild(cell);
         });
-        cellMatrix.push(cellRow);
 
         return cellMatrix;
     };
@@ -270,5 +88,246 @@ var TetrisMatrixSetter = (function () {
         return result.join(' ');
     };
     return TetrisMatrixSetter;
+})();
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var TetrisBlock = (function () {
+    function TetrisBlock() {
+    }
+    TetrisBlock.prototype.getPositionReferencePoint = function () {
+        return [];
+    };
+
+    TetrisBlock.prototype.moveBy = function (relativeCoordinate) {
+        Assert.assertArray(relativeCoordinate, 2);
+    };
+
+    TetrisBlock.prototype.rotate = function () {
+        var base = this.structure;
+        var size = base.size;
+        var rotated = new Matrix(base.size.slice().reverse());
+
+        base.forEach(function (item, coordinate) {
+            var newCoordinate = [];
+            newCoordinate[0] = coordinate[1];
+            newCoordinate[1] = size[1] - coordinate[0] + 1;
+        });
+
+        this._disappear();
+        this.structure = rotated;
+
+        //
+        this._appear(this.coordinate);
+    };
+
+    TetrisBlock.prototype._disappear = function () {
+        var filled = this._getFilledCellCoordinates();
+    };
+    TetrisBlock.prototype._appear = function (coordinate) {
+    };
+    TetrisBlock.prototype._getFilledCellCoordinates = function () {
+        var cellCoordinates = [];
+        var blockCoordinate = this.coordinate;
+        var positionReferencePoint = this.getPositionReferencePoint();
+
+        this.structure.forEach(function (item, structuralCoordinate) {
+            if (item) {
+                var cellCoordinate = structuralCoordinate.map(function (n, i) {
+                    return n + (blockCoordinate[i] - 1) - (positionReferencePoint[i] - 1);
+                });
+                if (cellCoordinate.every(function (n) {
+                    return n >= 1;
+                }))
+                    cellCoordinates.push(cellCoordinate);
+            }
+        });
+
+        return cellCoordinates;
+    };
+    return TetrisBlock;
+})();
+
+var TetrisBlockTypes = (function () {
+    function TetrisBlockTypes() {
+    }
+    TetrisBlockTypes.Madoka = "madoka";
+    TetrisBlockTypes.Homura = "homura";
+    TetrisBlockTypes.Sayaka = "sayaka";
+    TetrisBlockTypes.Kyouko = "kyouko";
+    TetrisBlockTypes.Mami = "mami";
+    TetrisBlockTypes.Nagisa = "nagisa";
+    TetrisBlockTypes.Kyubey = "kyubey";
+    return TetrisBlockTypes;
+})();
+
+var MadokaBlock = (function (_super) {
+    __extends(MadokaBlock, _super);
+    function MadokaBlock() {
+        _super.apply(this, arguments);
+        this.structure = new Matrix([1, 4], [
+            true, true, true, true
+        ]);
+        this.blockType = TetrisBlockTypes.Madoka;
+    }
+    MadokaBlock.prototype.getPositionReferencePoint = function () {
+        var size = this.structure.size;
+        if (size[0] == 1)
+            return [1, 2];
+        else
+            return [2, 1];
+    };
+    return MadokaBlock;
+})(TetrisBlock);
+
+var HomuraBlock = (function (_super) {
+    __extends(HomuraBlock, _super);
+    function HomuraBlock() {
+        _super.apply(this, arguments);
+        this.structure = new Matrix([2, 2], [
+            true, true,
+            true, true
+        ]);
+        this.blockType = TetrisBlockTypes.Homura;
+    }
+    HomuraBlock.prototype.getPositionReferencePoint = function () {
+        return [1, 1];
+    };
+    return HomuraBlock;
+})(TetrisBlock);
+
+var SayakaBlock = (function (_super) {
+    __extends(SayakaBlock, _super);
+    function SayakaBlock() {
+        _super.apply(this, arguments);
+        this.structure = new Matrix([3, 3], [
+            false, false, false,
+            true, true, true,
+            false, false, true
+        ]);
+        this.blockType = TetrisBlockTypes.Sayaka;
+    }
+    SayakaBlock.prototype.getPositionReferencePoint = function () {
+        return [1, 1];
+    };
+    return SayakaBlock;
+})(TetrisBlock);
+
+var KyoukoBlock = (function (_super) {
+    __extends(KyoukoBlock, _super);
+    function KyoukoBlock() {
+        _super.apply(this, arguments);
+        this.structure = new Matrix([3, 3], [
+            false, false, false,
+            true, true, true,
+            true, false, false
+        ]);
+        this.blockType = TetrisBlockTypes.Kyouko;
+    }
+    KyoukoBlock.prototype.getPositionReferencePoint = function () {
+        return [1, 1];
+    };
+    return KyoukoBlock;
+})(TetrisBlock);
+
+var MamiBlock = (function (_super) {
+    __extends(MamiBlock, _super);
+    function MamiBlock() {
+        _super.apply(this, arguments);
+        this.structure = new Matrix([2, 3], [
+            false, true, true,
+            true, true, false
+        ]);
+        this.blockType = TetrisBlockTypes.Mami;
+    }
+    MamiBlock.prototype.getPositionReferencePoint = function () {
+        var size = this.structure.size;
+        if (size[0] == 2)
+            return [2, 3];
+        else
+            return [3, 2];
+    };
+    return MamiBlock;
+})(TetrisBlock);
+
+var NagisaBlock = (function (_super) {
+    __extends(NagisaBlock, _super);
+    function NagisaBlock() {
+        _super.apply(this, arguments);
+        this.structure = new Matrix([2, 3], [
+            true, true, false,
+            false, true, true
+        ]);
+        this.blockType = TetrisBlockTypes.Nagisa;
+    }
+    NagisaBlock.prototype.getPositionReferencePoint = function () {
+        var size = this.structure.size;
+        if (size[0] == 2)
+            return [2, 3];
+        else
+            return [3, 2];
+    };
+    return NagisaBlock;
+})(TetrisBlock);
+
+var KyubeyBlock = (function (_super) {
+    __extends(KyubeyBlock, _super);
+    function KyubeyBlock() {
+        _super.apply(this, arguments);
+        this.structure = new Matrix([3, 3], [
+            false, false, false,
+            true, true, true,
+            false, true, false
+        ]);
+        this.blockType = TetrisBlockTypes.Kyubey;
+    }
+    KyubeyBlock.prototype.getPositionReferencePoint = function () {
+        return [1, 1];
+    };
+    return KyubeyBlock;
+})(TetrisBlock);
+var TetrisCenter = (function () {
+    function TetrisCenter() {
+    }
+    TetrisCenter.prototype.createCharacter = function (charType) {
+        var blockTypeOf = (function () {
+            switch (charType) {
+                case "madoka":
+                    return MadokaBlock;
+                case "homura":
+                    return HomuraBlock;
+                case "sayaka":
+                    return SayakaBlock;
+                case "kyouko":
+                    return KyoukoBlock;
+                case "mami":
+                    return MamiBlock;
+                case "nagisa":
+                    return NagisaBlock;
+                case "kyubey":
+                    return KyubeyBlock;
+            }
+        })();
+        var block = new blockTypeOf();
+        block.parentMap = this.morphedDiv;
+        return block;
+    };
+
+    TetrisCenter.prototype.isAvailable = function () {
+        var coordinates = [];
+        for (var _i = 0; _i < (arguments.length - 0); _i++) {
+            coordinates[_i] = arguments[_i + 0];
+        }
+        for (var i = 0; i < coordinates.length; i++) {
+            var coordinate = coordinates[i].slice().reverse();
+            if (!this.cellMatrix.get([coordinate[0], coordinate[1]]).dataset.tetrisCellType)
+                return false;
+        }
+        return true;
+    };
+    return TetrisCenter;
 })();
 //# sourceMappingURL=tetris.js.map
