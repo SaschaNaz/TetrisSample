@@ -32,7 +32,10 @@
         }
         for (var i = 0; i < coordinates.length; i++) {
             var coordinate = coordinates[i];
+            if (!this.cellMatrix[coordinate[0]][coordinate[1]].dataset.tetrisCellType)
+                return false;
         }
+        return true;
     };
     return TetrisCenter;
 })();

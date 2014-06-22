@@ -1,5 +1,6 @@
 ﻿class TetrisCenter {
     morphedDiv: HTMLDivElement;
+    cellMatrix: Matrix<TetrisCell>;
 
     createCharacter(charType: "madoka"): MadokaBlock
     createCharacter(charType: "homura"): HomuraBlock
@@ -35,8 +36,10 @@
 
     isAvailable(...coordinates: number[][]) {
         for (var i = 0; i < coordinates.length; i++) {
-            var coordinate = coordinates[i];
-            
+            var coordinate = coordinates[i].slice().reverse();
+            if (!this.cellMatrix.get([coordinate[0], coordinate[1]]).dataset.tetrisCellType)
+                return false;
         }
+        return true;
     }
 } 

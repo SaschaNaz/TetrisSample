@@ -22,10 +22,12 @@
     <Content Include="web.config" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="app.ts" />
-    <TypeScriptCompile Include="multidimension.ts" />
-    <TypeScriptCompile Include="tetris.ts" />
-    <TypeScriptCompile Include="tetriscenter.ts" />
+    <TypeScriptCompile Include="sources\app.ts" />
+    <TypeScriptCompile Include="sources\multidimension.ts" />
+    <TypeScriptCompile Include="submodules\mathextension\mathextension.d.ts" />
+    <TypeScriptCompile Include="sources\tetrismatrixsetter.ts" />
+    <TypeScriptCompile Include="sources\tetrisblocks.ts" />
+    <TypeScriptCompile Include="sources\tetriscenter.ts" />
   </ItemGroup>
   <ItemGroup>
     <None Include="web.Debug.config">
@@ -67,6 +69,8 @@
     <TypeScriptRemoveComments>false</TypeScriptRemoveComments>
     <TypeScriptSourceMap>true</TypeScriptSourceMap>
     <TypeScriptModuleKind>AMD</TypeScriptModuleKind>
+    <TypeScriptOutFile>tetris.js</TypeScriptOutFile>
+    <TypeScriptNoImplicitAny>True</TypeScriptNoImplicitAny>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <TypeScriptTarget>ES5</TypeScriptTarget>
