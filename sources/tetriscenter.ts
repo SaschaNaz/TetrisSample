@@ -2,15 +2,15 @@
     morphedDiv: HTMLDivElement;
     cellMatrix: Matrix<TetrisCell>;
 
-    createCharacter(charType: "madoka"): MadokaBlock
-    createCharacter(charType: "homura"): HomuraBlock
-    createCharacter(charType: "sayaka"): SayakaBlock
-    createCharacter(charType: "kyouko"): KyoukoBlock
-    createCharacter(charType: "mami"): MamiBlock
-    createCharacter(charType: "nagisa"): NagisaBlock
-    createCharacter(charType: "kyubey"): KyubeyBlock
-    createCharacter(charType: string): TetrisBlock
-    createCharacter(charType: string) {
+    createBlock(charType: "madoka"): MadokaBlock
+    createBlock(charType: "homura"): HomuraBlock
+    createBlock(charType: "sayaka"): SayakaBlock
+    createBlock(charType: "kyouko"): KyoukoBlock
+    createBlock(charType: "mami"): MamiBlock
+    createBlock(charType: "nagisa"): NagisaBlock
+    createBlock(charType: "kyubey"): KyubeyBlock
+    createBlock(charType: string): TetrisBlock
+    createBlock(charType: string) {
         var blockTypeOf = ((): typeof TetrisBlock => {
             switch (charType) {
                 case "madoka":
@@ -30,7 +30,8 @@
             }
         })();
         var block = new blockTypeOf();
-        block.parentMap = this.morphedDiv;
+        block.parentCenter = this;
+        block.initialize();
         return block;
     }
 

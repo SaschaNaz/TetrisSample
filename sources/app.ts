@@ -7,5 +7,5 @@ interface HTMLDivElement {
 }
 var center: TetrisCenter;
 document.addEventListener("DOMContentLoaded", () => {
-    center = TetrisMatrixSetter.morph(content, [15,10]);
+    center = TetrisMatrixSetter.morph(content, [15, 10]);
 });

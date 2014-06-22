@@ -99,6 +99,14 @@ var __extends = this.__extends || function (d, b) {
 var TetrisBlock = (function () {
     function TetrisBlock() {
     }
+    Object.defineProperty(TetrisBlock.prototype, "coordinate", {
+        get: function () {
+            return this._coordinate.slice();
+        },
+        enumerable: true,
+        configurable: true
+    });
+
     TetrisBlock.prototype.getPositionReferencePoint = function () {
         return [];
     };
@@ -107,16 +115,25 @@ var TetrisBlock = (function () {
         Assert.assertArray(relativeCoordinate, 2);
     };
 
+    TetrisBlock.prototype.initialize = function () {
+        var reference = this.getPositionReferencePoint();
+        var size = this.structure.size;
+        this._appear([
+            1 - (size[0] - 1) + (reference[0] - 1),
+            1 + Math.floor((this.parentCenter.cellMatrix.size[1] - size[1]) / 2) + (reference[1] - 1)
+        ]);
+    };
+
     TetrisBlock.prototype.rotate = function () {
         var base = this.structure;
         var rotated = new Matrix(base.size.slice().reverse());
         var rotatedSize = rotated.size;
 
         base.forEach(function (item, coordinate) {
-            var newCoordinate = [];
-            newCoordinate[0] = coordinate[1];
-            newCoordinate[1] = rotatedSize[1] - coordinate[0] + 1;
-            rotated.set(newCoordinate, item);
+            rotated.set([
+                coordinate[1],
+                rotatedSize[1] - coordinate[0] + 1
+            ], item);
         });
 
         this._disappear();
@@ -127,22 +144,32 @@ var TetrisBlock = (function () {
     };
 
     TetrisBlock.prototype._disappear = function () {
-        var filled = this._getFilledCellCoordinates();
+        var _this = this;
+        var filled = this._getValidCellCoordinates(this.coordinate);
+        filled.forEach(function (cellCoordinate) {
+            _this.parentCenter.cellMatrix.get(cellCoordinate).removeAttribute("data-tetris-cell-type");
+        });
     };
     TetrisBlock.prototype._appear = function (coordinate) {
+        var _this = this;
+        var targetCellCoordinates = this._getValidCellCoordinates(coordinate);
+        targetCellCoordinates.forEach(function (cellCoordinate) {
+            _this.parentCenter.cellMatrix.get(cellCoordinate).setAttribute("data-tetris-cell-type", _this.blockType);
+        });
+        this._coordinate = coordinate;
     };
-    TetrisBlock.prototype._getFilledCellCoordinates = function () {
+    TetrisBlock.prototype._getValidCellCoordinates = function (coordinate) {
         var cellCoordinates = [];
-        var blockCoordinate = this.coordinate;
-        var positionReferencePoint = this.getPositionReferencePoint();
+        var reference = this.getPositionReferencePoint();
+        var mapSize = this.parentCenter.cellMatrix.size;
 
         this.structure.forEach(function (item, structuralCoordinate) {
             if (item) {
                 var cellCoordinate = structuralCoordinate.map(function (n, i) {
-                    return n + (blockCoordinate[i] - 1) - (positionReferencePoint[i] - 1);
+                    return n + (coordinate[i] - 1) - (reference[i] - 1);
                 });
-                if (cellCoordinate.every(function (n) {
-                    return n >= 1;
+                if (cellCoordinate.every(function (n, i) {
+                    return n >= 1 && n <= mapSize[i];
                 }))
                     cellCoordinates.push(cellCoordinate);
             }
@@ -294,7 +321,7 @@ var KyubeyBlock = (function (_super) {
 var TetrisCenter = (function () {
     function TetrisCenter() {
     }
-    TetrisCenter.prototype.createCharacter = function (charType) {
+    TetrisCenter.prototype.createBlock = function (charType) {
         var blockTypeOf = (function () {
             switch (charType) {
                 case "madoka":
@@ -314,7 +341,8 @@ var TetrisCenter = (function () {
             }
         })();
         var block = new blockTypeOf();
-        block.parentMap = this.morphedDiv;
+        block.parentCenter = this;
+        block.initialize();
         return block;
     };
 
