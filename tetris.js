@@ -1,6 +1,26 @@
 ﻿var center;
 document.addEventListener("DOMContentLoaded", function () {
     center = TetrisMatrixSetter.morph(content, [15, 10]);
+    center.createRandomBlock();
+});
+document.addEventListener("keydown", function (ev) {
+    if (!center.currentControllingBlock)
+        return;
+    switch (ev.key) {
+        case "Left":
+            center.currentControllingBlock.moveLeft();
+            break;
+        case "Right":
+            center.currentControllingBlock.moveRight();
+            break;
+        case "Down":
+            if (!center.currentControllingBlock.moveDown())
+                center.createRandomBlock();
+            break;
+        case "Up":
+            center.currentControllingBlock.rotate();
+            break;
+    }
 });
 var Multidimension = (function () {
     function Multidimension() {
@@ -383,7 +403,12 @@ var TetrisCenter = (function () {
         var block = new blockTypeOf();
         block.parentCenter = this;
         block.initialize();
+        this.currentControllingBlock = block;
         return block;
+    };
+    TetrisCenter.prototype.createRandomBlock = function () {
+        var types = ["madoka", "homura", "sayaka", "kyouko", "mami", "nagisa", "kyubey"];
+        return this.createBlock(types[Math.floor(Math.random() * types.length)]);
     };
 
     TetrisCenter.prototype.isAvailable = function () {

@@ -1,6 +1,7 @@
 ﻿class TetrisCenter {
     morphedDiv: HTMLDivElement;
     cellMatrix: Matrix<TetrisCell>;
+    currentControllingBlock: TetrisBlock;
 
     createBlock(charType: "madoka"): MadokaBlock
     createBlock(charType: "homura"): HomuraBlock
@@ -32,7 +33,12 @@
         var block = new blockTypeOf();
         block.parentCenter = this;
         block.initialize();
+        this.currentControllingBlock = block;
         return block;
+    }
+    createRandomBlock() {
+        var types = ["madoka", "homura", "sayaka", "kyouko", "mami", "nagisa", "kyubey"];
+        return this.createBlock(types[Math.floor(Math.random() * types.length)]);
     }
 
     isAvailable(...coordinates: number[][]) {
