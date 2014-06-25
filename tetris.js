@@ -111,10 +111,6 @@ var TetrisBlock = (function () {
         return [];
     };
 
-    TetrisBlock.prototype.moveBy = function (relativeCoordinate) {
-        Assert.assertArray(relativeCoordinate, 2);
-    };
-
     TetrisBlock.prototype.initialize = function () {
         var reference = this.getPositionReferencePoint();
         var size = this.structure.size;
@@ -122,6 +118,45 @@ var TetrisBlock = (function () {
             1 - (size[0] - 1) + (reference[0] - 1),
             1 + Math.floor((this.parentCenter.cellMatrix.size[1] - size[1]) / 2) + (reference[1] - 1)
         ]);
+    };
+
+    TetrisBlock.prototype.moveLeft = function () {
+        return this._moveBy([0, -1]);
+    };
+    TetrisBlock.prototype.moveRight = function () {
+        return this._moveBy([0, 1]);
+    };
+    TetrisBlock.prototype.moveDown = function () {
+        return this._moveBy([1, 0]);
+    };
+
+    /**
+    @return Whether the movement succeeded or not.
+    */
+    TetrisBlock.prototype._moveBy = function (relativeCoordinate) {
+        Assert.assertArray(relativeCoordinate, 2);
+
+        var resultCoordinate = this.coordinate.map(function (n, i) {
+            return n + relativeCoordinate[i];
+        });
+        this._disappear();
+        if (this._isSpaceAvailable(resultCoordinate)) {
+            this._appear(resultCoordinate);
+            return true;
+        } else {
+            this._appear(this.coordinate);
+            return false;
+        }
+    };
+
+    TetrisBlock.prototype._isSpaceAvailable = function (coordinate) {
+        var map = this.parentCenter.cellMatrix;
+        var mapSize = map.size;
+        return this._getComputedCellCoordinates(coordinate).every(function (cellCoordinate) {
+            return cellCoordinate.every(function (n, i) {
+                return n >= 1 && n <= mapSize[i];
+            }) && !map.get(cellCoordinate).dataset.tetrisCellType;
+        });
     };
 
     TetrisBlock.prototype.rotate = function () {
@@ -139,38 +174,43 @@ var TetrisBlock = (function () {
         this._disappear();
         this.structure = rotated;
 
-        //
+        var isAvailable = this._isSpaceAvailable(this.coordinate);
+        if (!isAvailable)
+            this.structure = base; // rollback
+
         this._appear(this.coordinate);
+        return isAvailable;
     };
 
     TetrisBlock.prototype._disappear = function () {
         var _this = this;
-        var filled = this._getValidCellCoordinates(this.coordinate);
+        var filled = this._getComputedCellCoordinates(this.coordinate);
         filled.forEach(function (cellCoordinate) {
             _this.parentCenter.cellMatrix.get(cellCoordinate).removeAttribute("data-tetris-cell-type");
         });
     };
     TetrisBlock.prototype._appear = function (coordinate) {
         var _this = this;
-        var targetCellCoordinates = this._getValidCellCoordinates(coordinate);
+        var targetCellCoordinates = this._getComputedCellCoordinates(coordinate);
         targetCellCoordinates.forEach(function (cellCoordinate) {
             _this.parentCenter.cellMatrix.get(cellCoordinate).setAttribute("data-tetris-cell-type", _this.blockType);
         });
         this._coordinate = coordinate;
     };
-    TetrisBlock.prototype._getValidCellCoordinates = function (coordinate) {
+
+    /**
+    Get cell coordinates inside the map if we assume that the block is in the specified coordinate.
+    */
+    TetrisBlock.prototype._getComputedCellCoordinates = function (coordinate) {
         var cellCoordinates = [];
         var reference = this.getPositionReferencePoint();
-        var mapSize = this.parentCenter.cellMatrix.size;
 
         this.structure.forEach(function (item, structuralCoordinate) {
             if (item) {
                 var cellCoordinate = structuralCoordinate.map(function (n, i) {
                     return n + (coordinate[i] - 1) - (reference[i] - 1);
                 });
-                if (cellCoordinate.every(function (n, i) {
-                    return n >= 1 && n <= mapSize[i];
-                }))
+                if (cellCoordinate[0] >= 1)
                     cellCoordinates.push(cellCoordinate);
             }
         });
