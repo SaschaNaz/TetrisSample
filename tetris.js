@@ -15,6 +15,7 @@ document.addEventListener("keydown", function (ev) {
             break;
         case "Down":
             if (!center.currentControllingBlock.moveDown()) {
+                center.removeFullLines();
                 center.createRandomBlock();
             }
             break;
@@ -50,66 +51,6 @@ var Multidimension = (function () {
         }
     };
     return Multidimension;
-})();
-var Assert = (function () {
-    function Assert() {
-    }
-    Assert.assertArray = function (array, length) {
-        if (!Array.isArray(array) || array.length != length)
-            throw new Error("Invalid parameter, expected " + length + "-dimensional array.");
-    };
-    return Assert;
-})();
-
-var TetrisMatrixSetter = (function () {
-    function TetrisMatrixSetter() {
-    }
-    TetrisMatrixSetter.morph = function (div, size) {
-        if (div.__proto__ !== HTMLDivElement.prototype)
-            throw new Error("'div' should be HTMLDivElement");
-        Assert.assertArray(size, 2);
-        div.style.display = "-ms-grid";
-        div.style.msGridRows = this._generateGridPartitionString(size[0]);
-        div.style.msGridColumns = this._generateGridPartitionString(size[1]);
-
-        var tetrisCenter = new TetrisCenter();
-        tetrisCenter.morphedDiv = div;
-        tetrisCenter.cellMatrix = this._appendCells(div, size);
-        return tetrisCenter;
-    };
-    TetrisMatrixSetter.release = function (div) {
-        div.style.display = "";
-        while (div.firstChild)
-            div.removeChild(div.firstChild);
-    };
-    TetrisMatrixSetter._appendCells = function (div, size) {
-        var _this = this;
-        var cellMatrix = new Matrix(size);
-
-        Multidimension.forEach(size, function (coordinate) {
-            var cell = _this._createCell(coordinate);
-            cellMatrix.set(coordinate.map(function (n) {
-                return n + 1;
-            }), cell);
-            div.appendChild(cell);
-        });
-
-        return cellMatrix;
-    };
-    TetrisMatrixSetter._createCell = function (coordinate) {
-        Assert.assertArray(coordinate, 2);
-        var cell = document.createElement("div");
-        cell.style.msGridRow = coordinate[0] + 1;
-        cell.style.msGridColumn = coordinate[1] + 1;
-        return cell;
-    };
-    TetrisMatrixSetter._generateGridPartitionString = function (partitions) {
-        var result = [];
-        for (var i = 0; i < partitions; i++)
-            result.push('1fr');
-        return result.join(' ');
-    };
-    return TetrisMatrixSetter;
 })();
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -428,15 +369,40 @@ var TetrisCenter = (function () {
     };
 
     TetrisCenter.prototype.removeFullLines = function () {
+        var _this = this;
         var topRow = this.currentControllingBlock.getTopLeftCoordinate()[0];
         var rowLength = this.currentControllingBlock.structure.size[0];
+
+        for (var row = topRow; row <= topRow + (rowLength - 1); row++) {
+            var rowCells = this.getRowCells(row);
+            if (this.isSpaceFull(rowCells)) {
+                rowCells.forEach(function (cellCoordinate) {
+                    return _this.cellMatrix.get(cellCoordinate).removeAttribute("data-tetris-cell-type");
+                });
+                this._shiftRowsDown(row + 1);
+            }
+        }
     };
 
-    TetrisCenter.prototype.isLineFull = function (row) {
-        //var columnLength = this.cellMatrix.size[1];
-        //for (var i = 1; i <= columnLength; i++) {
-        //    if (!this.cellMatrix.get([row, i]).dataset.tetrisCellType)
-        //}
+    TetrisCenter.prototype._shiftRowsDown = function (targetBottomRow) {
+    };
+
+    TetrisCenter.prototype.getRowCells = function (row) {
+        var columnLength = this.cellMatrix.size[1];
+        var rowCells = [];
+        for (var column = 1; column <= columnLength; column++)
+            rowCells.push([row, column]);
+        return rowCells;
+    };
+
+    TetrisCenter.prototype.isSpaceFull = function (coordinates) {
+        var map = this.cellMatrix;
+        var mapSize = map.size;
+        return coordinates.every(function (cellCoordinate) {
+            return cellCoordinate.every(function (n, i) {
+                return n >= 1 && n <= mapSize[i];
+            }) && !!map.get(cellCoordinate).dataset.tetrisCellType;
+        });
     };
 
     TetrisCenter.prototype.isSpaceAvailable = function (coordinates) {
@@ -449,5 +415,65 @@ var TetrisCenter = (function () {
         });
     };
     return TetrisCenter;
+})();
+var Assert = (function () {
+    function Assert() {
+    }
+    Assert.assertArray = function (array, length) {
+        if (!Array.isArray(array) || array.length != length)
+            throw new Error("Invalid parameter, expected " + length + "-dimensional array.");
+    };
+    return Assert;
+})();
+
+var TetrisMatrixSetter = (function () {
+    function TetrisMatrixSetter() {
+    }
+    TetrisMatrixSetter.morph = function (div, size) {
+        if (div.__proto__ !== HTMLDivElement.prototype)
+            throw new Error("'div' should be HTMLDivElement");
+        Assert.assertArray(size, 2);
+        div.style.display = "-ms-grid";
+        div.style.msGridRows = this._generateGridPartitionString(size[0]);
+        div.style.msGridColumns = this._generateGridPartitionString(size[1]);
+
+        var tetrisCenter = new TetrisCenter();
+        tetrisCenter.morphedDiv = div;
+        tetrisCenter.cellMatrix = this._appendCells(div, size);
+        return tetrisCenter;
+    };
+    TetrisMatrixSetter.release = function (div) {
+        div.style.display = "";
+        while (div.firstChild)
+            div.removeChild(div.firstChild);
+    };
+    TetrisMatrixSetter._appendCells = function (div, size) {
+        var _this = this;
+        var cellMatrix = new Matrix(size);
+
+        Multidimension.forEach(size, function (coordinate) {
+            var cell = _this._createCell(coordinate);
+            cellMatrix.set(coordinate.map(function (n) {
+                return n + 1;
+            }), cell);
+            div.appendChild(cell);
+        });
+
+        return cellMatrix;
+    };
+    TetrisMatrixSetter._createCell = function (coordinate) {
+        Assert.assertArray(coordinate, 2);
+        var cell = document.createElement("div");
+        cell.style.msGridRow = coordinate[0] + 1;
+        cell.style.msGridColumn = coordinate[1] + 1;
+        return cell;
+    };
+    TetrisMatrixSetter._generateGridPartitionString = function (partitions) {
+        var result = [];
+        for (var i = 0; i < partitions; i++)
+            result.push('1fr');
+        return result.join(' ');
+    };
+    return TetrisMatrixSetter;
 })();
 //# sourceMappingURL=tetris.js.map

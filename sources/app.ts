@@ -22,6 +22,7 @@ document.addEventListener("keydown", (ev) => {
             break;
         case "Down":
             if (!center.currentControllingBlock.moveDown()) {
+                center.removeFullLines();
                 center.createRandomBlock();
             }
             break;
