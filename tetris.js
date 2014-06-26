@@ -1,7 +1,10 @@
 ﻿var center;
+var timer;
 document.addEventListener("DOMContentLoaded", function () {
     center = TetrisMatrixSetter.morph(content, [15, 10]);
     center.createRandomBlock();
+
+    timer = setInterval(moveDown, 1000);
 });
 document.addEventListener("keydown", function (ev) {
     if (!center.currentControllingBlock)
@@ -14,16 +17,21 @@ document.addEventListener("keydown", function (ev) {
             center.currentControllingBlock.moveRight();
             break;
         case "Down":
-            if (!center.currentControllingBlock.moveDown()) {
-                center.removeFullLines();
-                center.createRandomBlock();
-            }
+            moveDown();
+            clearInterval(timer);
+            timer = setInterval(moveDown, 1000);
             break;
         case "Up":
             center.currentControllingBlock.rotate();
             break;
     }
 });
+var moveDown = function () {
+    if (!center.currentControllingBlock.moveDown()) {
+        center.removeFullLines();
+        center.createRandomBlock();
+    }
+};
 var Multidimension = (function () {
     function Multidimension() {
     }

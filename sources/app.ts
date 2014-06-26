@@ -6,9 +6,12 @@ interface HTMLDivElement {
     __proto__: HTMLDivElement;
 }
 var center: TetrisCenter;
+var timer: number;
 document.addEventListener("DOMContentLoaded", () => {
     center = TetrisMatrixSetter.morph(content, [15, 10]);
     center.createRandomBlock();
+
+    timer = setInterval(moveDown, 1000);
 });
 document.addEventListener("keydown", (ev) => {
     if (!center.currentControllingBlock)
@@ -21,13 +24,18 @@ document.addEventListener("keydown", (ev) => {
             center.currentControllingBlock.moveRight();
             break;
         case "Down":
-            if (!center.currentControllingBlock.moveDown()) {
-                center.removeFullLines();
-                center.createRandomBlock();
-            }
+            moveDown();
+            clearInterval(timer);
+            timer = setInterval(moveDown, 1000);
             break;
         case "Up":
             center.currentControllingBlock.rotate();
             break;
     }
 })
+var moveDown = () => {
+    if (!center.currentControllingBlock.moveDown()) {
+        center.removeFullLines();
+        center.createRandomBlock();
+    }
+}
