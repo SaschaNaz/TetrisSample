@@ -21,8 +21,9 @@ document.addEventListener("keydown", (ev) => {
             center.currentControllingBlock.moveRight();
             break;
         case "Down":
-            if (!center.currentControllingBlock.moveDown())
+            if (!center.currentControllingBlock.moveDown()) {
                 center.createRandomBlock();
+            }
             break;
         case "Up":
             center.currentControllingBlock.rotate();

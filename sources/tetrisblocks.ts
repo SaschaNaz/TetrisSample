@@ -49,11 +49,11 @@
     }
 
     private _isSpaceAvailable(coordinate: number[]) {
-        var map = this.parentCenter.cellMatrix;
-        var mapSize = map.size;
-        return this._getComputedCellCoordinates(coordinate).every(
-            (cellCoordinate) => cellCoordinate.every((n, i) => n >= 1 && n <= mapSize[i])
-                && !map.get(cellCoordinate).dataset.tetrisCellType);
+        var mapped = this._getMappedComponents(coordinate);
+        if (!this._isEveryCoordinateValid(mapped))
+            return false;
+        else
+            return this.parentCenter.isSpaceAvailable(this._filterVisibleCoordinates(this._getMappedComponents(coordinate)));
     }
 
     rotate() {
@@ -80,13 +80,13 @@
     }
 
     private _disappear() {
-        var filled = this._getComputedCellCoordinates(this.coordinate);
+        var filled = this._filterVisibleCoordinates(this._getMappedComponents(this.coordinate));
         filled.forEach((cellCoordinate) => {
             this.parentCenter.cellMatrix.get(cellCoordinate).removeAttribute("data-tetris-cell-type");
         });
     }
     private _appear(coordinate: number[]) {
-        var targetCellCoordinates = this._getComputedCellCoordinates(coordinate);
+        var targetCellCoordinates = this._filterVisibleCoordinates(this._getMappedComponents(coordinate));
         targetCellCoordinates.forEach((cellCoordinate) => {
             this.parentCenter.cellMatrix.get(cellCoordinate).setAttribute("data-tetris-cell-type", this.blockType);
         });
@@ -95,19 +95,30 @@
     /**
     Get cell coordinates inside the map if we assume that the block is in the specified coordinate.
     */
-    private _getComputedCellCoordinates(coordinate: number[]) {
-        var cellCoordinates: number[][] = [];
-        var reference = this.getPositionReferencePoint();
-
-        this.structure.forEach((item, structuralCoordinate) => {
-            if (item) {
-                var cellCoordinate = structuralCoordinate.map((n, i) => n + (coordinate[i] - 1) - (reference[i] - 1));
-                if (cellCoordinate[0] >= 1)
-                    cellCoordinates.push(cellCoordinate);
-            }
+    private _getMappedComponents(coordinate: number[]) {
+        var blockComponents: number[][] = [];
+        this.structure.forEach((item, componentCoordinate) => {
+            if (item) 
+                blockComponents.push(componentCoordinate);
         });
 
-        return cellCoordinates;
+        return this._mapCells(coordinate, blockComponents);
+    }
+
+    private _mapCells(blockCoordinate: number[], blockComponents: number[][]) {
+        var reference = this.getPositionReferencePoint();
+        return blockComponents.map((component) => component.map((n, i) => n + (blockCoordinate[i] - 1) - (reference[i] - 1)));
+    }
+    private _isEveryCoordinateValid(coordinates: number[][]) {
+        var mapSize = this.parentCenter.cellMatrix.size;
+        return coordinates.every((coordinate) => coordinate[1] >= 1 && coordinate[1] <= mapSize[1]);
+    }
+    private _filterVisibleCoordinates(coordinates: number[][]) {
+        return coordinates.filter((coordinate) => coordinate[0] >= 1);
+    }
+
+    getTopLeftCoordinate() {
+        return this._mapCells(this.coordinate, [[1, 1]])[0];
     }
 }
 
@@ -118,7 +129,7 @@ class TetrisBlockTypes {
     static Kyouko = "kyouko";
     static Mami = "mami";
     static Nagisa = "nagisa";
-    static Kyubey = "kyubey"
+    static Kyubey = "kyubey";
 }
 
 class MadokaBlock extends TetrisBlock {

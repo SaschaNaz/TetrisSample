@@ -14,8 +14,9 @@ document.addEventListener("keydown", function (ev) {
             center.currentControllingBlock.moveRight();
             break;
         case "Down":
-            if (!center.currentControllingBlock.moveDown())
+            if (!center.currentControllingBlock.moveDown()) {
                 center.createRandomBlock();
+            }
             break;
         case "Up":
             center.currentControllingBlock.rotate();
@@ -170,13 +171,11 @@ var TetrisBlock = (function () {
     };
 
     TetrisBlock.prototype._isSpaceAvailable = function (coordinate) {
-        var map = this.parentCenter.cellMatrix;
-        var mapSize = map.size;
-        return this._getComputedCellCoordinates(coordinate).every(function (cellCoordinate) {
-            return cellCoordinate.every(function (n, i) {
-                return n >= 1 && n <= mapSize[i];
-            }) && !map.get(cellCoordinate).dataset.tetrisCellType;
-        });
+        var mapped = this._getMappedComponents(coordinate);
+        if (!this._isEveryCoordinateValid(mapped))
+            return false;
+        else
+            return this.parentCenter.isSpaceAvailable(this._filterVisibleCoordinates(this._getMappedComponents(coordinate)));
     };
 
     TetrisBlock.prototype.rotate = function () {
@@ -204,14 +203,14 @@ var TetrisBlock = (function () {
 
     TetrisBlock.prototype._disappear = function () {
         var _this = this;
-        var filled = this._getComputedCellCoordinates(this.coordinate);
+        var filled = this._filterVisibleCoordinates(this._getMappedComponents(this.coordinate));
         filled.forEach(function (cellCoordinate) {
             _this.parentCenter.cellMatrix.get(cellCoordinate).removeAttribute("data-tetris-cell-type");
         });
     };
     TetrisBlock.prototype._appear = function (coordinate) {
         var _this = this;
-        var targetCellCoordinates = this._getComputedCellCoordinates(coordinate);
+        var targetCellCoordinates = this._filterVisibleCoordinates(this._getMappedComponents(coordinate));
         targetCellCoordinates.forEach(function (cellCoordinate) {
             _this.parentCenter.cellMatrix.get(cellCoordinate).setAttribute("data-tetris-cell-type", _this.blockType);
         });
@@ -221,21 +220,38 @@ var TetrisBlock = (function () {
     /**
     Get cell coordinates inside the map if we assume that the block is in the specified coordinate.
     */
-    TetrisBlock.prototype._getComputedCellCoordinates = function (coordinate) {
-        var cellCoordinates = [];
-        var reference = this.getPositionReferencePoint();
-
-        this.structure.forEach(function (item, structuralCoordinate) {
-            if (item) {
-                var cellCoordinate = structuralCoordinate.map(function (n, i) {
-                    return n + (coordinate[i] - 1) - (reference[i] - 1);
-                });
-                if (cellCoordinate[0] >= 1)
-                    cellCoordinates.push(cellCoordinate);
-            }
+    TetrisBlock.prototype._getMappedComponents = function (coordinate) {
+        var blockComponents = [];
+        this.structure.forEach(function (item, componentCoordinate) {
+            if (item)
+                blockComponents.push(componentCoordinate);
         });
 
-        return cellCoordinates;
+        return this._mapCells(coordinate, blockComponents);
+    };
+
+    TetrisBlock.prototype._mapCells = function (blockCoordinate, blockComponents) {
+        var reference = this.getPositionReferencePoint();
+        return blockComponents.map(function (component) {
+            return component.map(function (n, i) {
+                return n + (blockCoordinate[i] - 1) - (reference[i] - 1);
+            });
+        });
+    };
+    TetrisBlock.prototype._isEveryCoordinateValid = function (coordinates) {
+        var mapSize = this.parentCenter.cellMatrix.size;
+        return coordinates.every(function (coordinate) {
+            return coordinate[1] >= 1 && coordinate[1] <= mapSize[1];
+        });
+    };
+    TetrisBlock.prototype._filterVisibleCoordinates = function (coordinates) {
+        return coordinates.filter(function (coordinate) {
+            return coordinate[0] >= 1;
+        });
+    };
+
+    TetrisBlock.prototype.getTopLeftCoordinate = function () {
+        return this._mapCells(this.coordinate, [[1, 1]])[0];
     };
     return TetrisBlock;
 })();
@@ -411,17 +427,26 @@ var TetrisCenter = (function () {
         return this.createBlock(types[Math.floor(Math.random() * types.length)]);
     };
 
-    TetrisCenter.prototype.isAvailable = function () {
-        var coordinates = [];
-        for (var _i = 0; _i < (arguments.length - 0); _i++) {
-            coordinates[_i] = arguments[_i + 0];
-        }
-        for (var i = 0; i < coordinates.length; i++) {
-            var coordinate = coordinates[i].slice().reverse();
-            if (!this.cellMatrix.get([coordinate[0], coordinate[1]]).dataset.tetrisCellType)
-                return false;
-        }
-        return true;
+    TetrisCenter.prototype.removeFullLines = function () {
+        var topRow = this.currentControllingBlock.getTopLeftCoordinate()[0];
+        var rowLength = this.currentControllingBlock.structure.size[0];
+    };
+
+    TetrisCenter.prototype.isLineFull = function (row) {
+        //var columnLength = this.cellMatrix.size[1];
+        //for (var i = 1; i <= columnLength; i++) {
+        //    if (!this.cellMatrix.get([row, i]).dataset.tetrisCellType)
+        //}
+    };
+
+    TetrisCenter.prototype.isSpaceAvailable = function (coordinates) {
+        var map = this.cellMatrix;
+        var mapSize = map.size;
+        return coordinates.every(function (cellCoordinate) {
+            return cellCoordinate.every(function (n, i) {
+                return n >= 1 && n <= mapSize[i];
+            }) && !map.get(cellCoordinate).dataset.tetrisCellType;
+        });
     };
     return TetrisCenter;
 })();

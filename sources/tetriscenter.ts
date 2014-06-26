@@ -41,12 +41,25 @@
         return this.createBlock(types[Math.floor(Math.random() * types.length)]);
     }
 
-    isAvailable(...coordinates: number[][]) {
-        for (var i = 0; i < coordinates.length; i++) {
-            var coordinate = coordinates[i].slice().reverse();
-            if (!this.cellMatrix.get([coordinate[0], coordinate[1]]).dataset.tetrisCellType)
-                return false;
-        }
-        return true;
+    removeFullLines() {
+        var topRow = this.currentControllingBlock.getTopLeftCoordinate()[0];
+        var rowLength = this.currentControllingBlock.structure.size[0];
+
+    }
+
+    isLineFull(row: number) {
+        //var columnLength = this.cellMatrix.size[1];
+        //for (var i = 1; i <= columnLength; i++) {
+        //    if (!this.cellMatrix.get([row, i]).dataset.tetrisCellType)
+
+        //}
+    }
+
+    isSpaceAvailable(coordinates: number[][]) {
+        var map = this.cellMatrix;
+        var mapSize = map.size;
+        return coordinates.every(
+            (cellCoordinate) => cellCoordinate.every((n, i) => n >= 1 && n <= mapSize[i])
+                && !map.get(cellCoordinate).dataset.tetrisCellType);
     }
 } 
