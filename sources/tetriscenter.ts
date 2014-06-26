@@ -49,13 +49,23 @@
             var rowCells = this.getRowCells(row);
             if (this.isSpaceFull(rowCells)) {
                 rowCells.forEach((cellCoordinate) => this.cellMatrix.get(cellCoordinate).removeAttribute("data-tetris-cell-type"));
-                this._shiftRowsDown(row + 1);
+                this._shiftRowsDown(row - 1);
             }
         }
     }
 
     _shiftRowsDown(targetBottomRow: number) {
+        for (var row = targetBottomRow; row >= 1; row--) {
+            this.cellMatrix.submatrix([row, 1], [row, undefined]).forEach((item, coordinate) => {
+                var type = item.dataset.tetrisCellType;
+                item.removeAttribute("data-tetris-cell-type");
+                var shiftedCoordinate = coordinate.slice();
+                shiftedCoordinate[0] += 1//(row - 1) + 1; - submatrix bug... should be (row - 1 + 1) originally
 
+                if (type)
+                    this.cellMatrix.get(shiftedCoordinate).setAttribute("data-tetris-cell-type", type);
+            });
+        }
     }
 
     getRowCells(row: number) {
