@@ -459,7 +459,7 @@ var TetrisCenter = (function () {
                 var type = item.dataset.tetrisCellType;
                 item.removeAttribute("data-tetris-cell-type");
                 var shiftedCoordinate = coordinate.slice();
-                shiftedCoordinate[0] += 1;
+                shiftedCoordinate[0] += (row - 1) + 1;
 
                 if (type)
                     _this.cellMatrix.get(shiftedCoordinate).setAttribute("data-tetris-cell-type", type);

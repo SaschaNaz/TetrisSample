@@ -60,7 +60,7 @@
                 var type = item.dataset.tetrisCellType;
                 item.removeAttribute("data-tetris-cell-type");
                 var shiftedCoordinate = coordinate.slice();
-                shiftedCoordinate[0] += 1//(row - 1) + 1; - submatrix bug... should be (row - 1 + 1) originally
+                shiftedCoordinate[0] += (row - 1) + 1;
 
                 if (type)
                     this.cellMatrix.get(shiftedCoordinate).setAttribute("data-tetris-cell-type", type);
