@@ -17,8 +17,8 @@ class TetrisMatrixSetter {
             throw new Error("'div' should be HTMLDivElement");
         Assert.assertArray(size, 2);
         div.style.display = "-ms-grid";
-        div.style.msGridRows = this._generateGridPartitionString(size[0]);
-        div.style.msGridColumns = this._generateGridPartitionString(size[1]);
+        div.style.msGridRows = "(1fr)[" + size[0].toFixed(0) + "]";
+        div.style.msGridColumns = "(1fr)[" + size[1].toFixed(0) + "]";
 
         var tetrisCenter = new TetrisCenter();
         tetrisCenter.morphedDiv = div;
@@ -47,11 +47,5 @@ class TetrisMatrixSetter {
         cell.style.msGridRow = coordinate[0] + 1;
         cell.style.msGridColumn = coordinate[1] + 1;
         return <TetrisCell>cell;
-    }
-    private static _generateGridPartitionString(partitions: number) {
-        var result: string[] = [];
-        for (var i = 0; i < partitions; i++)
-            result.push('1fr');
-        return result.join(' ');
     }
 }
