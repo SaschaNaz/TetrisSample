@@ -1,0 +1,23 @@
+{
+  "name": "tetrissample",
+  "version": "1.0.0",
+  "description": "",
+  "main": "tetris.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saschanaz/TetrisSample.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saschanaz/TetrisSample/issues"
+  },
+  "homepage": "https://github.com/saschanaz/TetrisSample#readme",
+  "devDependencies": {
+    "typescript": "^4.1.2"
+  },
+  "private": true
+}

@@ -5,7 +5,7 @@
     }
 }
 interface TetrisCell extends HTMLDivElement {
-    dataset: TetrisCellDataset;
+    dataset: DOMStringMap & TetrisCellDataset;
 }
 interface TetrisCellDataset {
     tetrisCellType: string;
@@ -13,12 +13,10 @@ interface TetrisCellDataset {
 
 class TetrisMatrixSetter {
     static morph(div: HTMLDivElement, size: number[]) {
-        if (div.__proto__ !== HTMLDivElement.prototype)
-            throw new Error("'div' should be HTMLDivElement");
         Assert.assertArray(size, 2);
-        div.style.display = "-ms-grid";
-        div.style.msGridRows = "(1fr)[" + size[0].toFixed(0) + "]";
-        div.style.msGridColumns = "(1fr)[" + size[1].toFixed(0) + "]";
+        div.style.display = "grid";
+        div.style.gridTemplateRows = `repeat(${size[0].toFixed(0)}, 1fr)`;
+        div.style.gridTemplateColumns = `repeat(${size[1].toFixed(0)}, 1fr)`;
 
         var tetrisCenter = new TetrisCenter();
         tetrisCenter.morphedDiv = div;
@@ -44,8 +42,8 @@ class TetrisMatrixSetter {
     private static _createCell(coordinate: number[]) {
         Assert.assertArray(coordinate, 2);
         var cell = document.createElement("div");
-        cell.style.msGridRow = coordinate[0] + 1;
-        cell.style.msGridColumn = coordinate[1] + 1;
+        cell.style.gridRow = String(coordinate[0] + 1);
+        cell.style.gridColumn = String(coordinate[1] + 1);
         return <TetrisCell>cell;
     }
 }

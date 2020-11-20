@@ -1,10 +1,4 @@
 ﻿declare var content: HTMLDivElement;
-interface Element {
-    __proto__: any;
-}
-interface HTMLDivElement {
-    __proto__: HTMLDivElement;
-}
 var center: TetrisCenter;
 var timer: number;
 document.addEventListener("DOMContentLoaded", () => {
@@ -17,18 +11,18 @@ document.addEventListener("keydown", (ev) => {
     if (!center.currentControllingBlock)
         return;
     switch (ev.key) {
-        case "Left":
+        case "ArrowLeft":
             center.currentControllingBlock.moveLeft();
             break;
-        case "Right":
+        case "ArrowRight":
             center.currentControllingBlock.moveRight();
             break;
-        case "Down":
+        case "ArrowDown":
             moveDown();
             clearInterval(timer);
             timer = setInterval(moveDown, 1000);
             break;
-        case "Up":
+        case "ArrowUp":
             center.currentControllingBlock.rotate();
             break;
     }
